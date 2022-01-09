@@ -1,0 +1,8 @@
+You guess a word by one letter at a time
+If you guess a letter correctly it appears down below
+If you do not - you get a strike
+Each word you get 5 no-consequence strikes
+After no-consequence strikes end, each strike draws part of the hangman
+When hangman is fully drawn, you loose
+Each word you guess gives you score of lengh of the word
+Press "q" to quit
