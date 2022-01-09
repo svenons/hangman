@@ -11,6 +11,7 @@ leaderboardf = filepath + "\\leaderboard.txt"
 
 guesswordslist = []
 
+#quit game
 def exit():
     quit()
 
