@@ -2,6 +2,7 @@ import os
 import turtle
 import time
 import random
+import threading
 
 #open guess words file
 filepath = os.path.dirname(os.path.abspath(__file__))
@@ -122,10 +123,10 @@ def chooseWord():
         guesswordslist.remove(chooseWord.wordofchoice)
         chooseWord.wordguess = chooseWord.wordofchoice
         gameItself.enteraletter = "Enter a letter"
-        wordlist = []
+        chooseWord.wordlist = []
         chooseWord.wordguesshidden = ""
         for a in chooseWord.wordguess:
-            wordlist.append(a)
+            chooseWord.wordlist.append(a)
         for x in range(0, len(chooseWord.wordguess)):
             chooseWord.wordguesshidden = chooseWord.wordguesshidden + "_"
         wordstrike = 0
@@ -146,11 +147,11 @@ def gameItself():
                     if guess in chooseWord.wordofchoice:
                         index = chooseWord.wordlist.index(guess)
                         gameItself.wordlist[index] = "xyz"
-                        startofword = gameItself.wordguesshidden[:index]
-                        endofword = gameItself.wordguesshidden[(index + 1):]
-                        wordguesshidden = startofword + guess + endofword
+                        startofword = chooseWord.wordguesshidden[:index]
+                        endofword = chooseWord.wordguesshidden[(index + 1):]
+                        chooseWord.wordguesshidden = startofword + guess + endofword
                         teksts.clear()
-                        writeP(f"Current guess: {wordguesshidden}")
+                        writeP(f"Current guess: {chooseWord.wordguesshidden}")
                         gameItself.enteraletter = "Enter a letter"
                     else:
                         gameItself.enteraletter = "Such letter isn't found"
@@ -231,31 +232,24 @@ def gameItself():
                                 try:
                                     gameItself.score
                                 except:
-                                    score = 0
-                                writeHeading(f"You have lost the game \nScore: {score}", alignv="left", who=rupucis)
+                                    gameItself.score = 0
+                                writeHeading(f"You have lost the game \nScore: {gameItself.score}", alignv="left", who=rupucis)
                                 time.sleep(5)
-                                return
-
-
-                        strikewrite(gameItself.wordstrike, gameItself.strike)
-                        return
-
-
-                        
+                                return                    
                 else:
-                    enteraletter = "Incorrect entry"
-                if wordguesshidden == gameItself.wordguess:
+                    gameItself.enteraletter = "Incorrect entry"
+                if chooseWord.wordguesshidden == gameItself.wordguess:
                     teksts.clear()
                     try:
                         gameItself.score
                     except:
                         gameItself.score = 0
-                    gameItself.score = gameItself.score + len(wordguesshidden)
+                    gameItself.score = gameItself.score + len(chooseWord.wordguesshidden)
                     scorewrite(gameItself.core)
-                    writeP(f"Score earned: {len(wordguesshidden)}")
+                    writeP(f"Score earned: {len(chooseWord.wordguesshidden)}")
                     time.sleep(3)
                     if guesswordslist == []:
-                        gameItself.gameFinished = True
+                        return
                     else:
                         chooseWord()
             except:
@@ -265,10 +259,12 @@ def gameItself():
                 if windo == "r":
                                         score = 0
                                         gameItself.strike = 0
-                                        wordstrike = 0
+                                        gameItself.wordstrike = 0
                                         gameItself.enteraletter = "Enter a letter"
                                         rupucis.clear()
                                         rupucis.goto(0, 0)
+            strikewrite(gameItself.wordstrike, gameItself.strike)
+            gameItself()
 
 def continuegame():
         teksts.clear()
@@ -298,7 +294,9 @@ gotowidth = (screensizewidth / 10)
 tgoto(3, gotowidth, gotoheight)
 
 writeHeading("Press space to continue", alignv="left")
+
 logs.onkeypress(continuegame, "space")
+
 
 try:
     gameItself.gameFinished
