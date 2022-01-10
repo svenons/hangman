@@ -129,8 +129,8 @@ def chooseWord():
             chooseWord.wordlist.append(a)
         for x in range(0, len(chooseWord.wordguess)):
             chooseWord.wordguesshidden = chooseWord.wordguesshidden + "_"
-        wordstrike = 0
-        strikewrite(wordstrike, gameItself.strike)
+        gameItself.wordstrike = 0
+        strikewrite(gameItself.wordstrike, gameItself.strike)
 
 def gameItself():
             try:
@@ -145,14 +145,21 @@ def gameItself():
             try:
                 if len(guess) == 1:
                     if guess in chooseWord.wordofchoice:
-                        index = chooseWord.wordlist.index(guess)
-                        gameItself.wordlist[index] = "xyz"
-                        startofword = chooseWord.wordguesshidden[:index]
-                        endofword = chooseWord.wordguesshidden[(index + 1):]
-                        chooseWord.wordguesshidden = startofword + guess + endofword
-                        teksts.clear()
-                        writeP(f"Current guess: {chooseWord.wordguesshidden}")
-                        gameItself.enteraletter = "Enter a letter"
+                        def moreIndex():
+                            try:
+                                index = chooseWord.wordlist.index(guess)
+                                return True
+                            except:
+                                return False
+                        while moreIndex() == True:
+                            index = chooseWord.wordlist.index(guess)
+                            chooseWord.wordlist[index] = "xyz"
+                            startofword = chooseWord.wordguesshidden[:index]
+                            endofword = chooseWord.wordguesshidden[(index + 1):]
+                            chooseWord.wordguesshidden = startofword + guess + endofword
+                            teksts.clear()
+                            writeP(f"Current guess: {chooseWord.wordguesshidden}")
+                            gameItself.enteraletter = "Enter a letter"
                     else:
                         gameItself.enteraletter = "Such letter isn't found"
                         try:
@@ -238,7 +245,7 @@ def gameItself():
                                 return                    
                 else:
                     gameItself.enteraletter = "Incorrect entry"
-                if chooseWord.wordguesshidden == gameItself.wordguess:
+                if chooseWord.wordguesshidden == chooseWord.wordguess:
                     teksts.clear()
                     try:
                         gameItself.score
@@ -252,6 +259,7 @@ def gameItself():
                         return
                     else:
                         chooseWord()
+                        
             except:
                 windo = turtle.textinput("Quit", 'Enter "q" if you want to quit, "r" to restart game')
                 if windo == "q":
