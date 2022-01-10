@@ -8,7 +8,6 @@ filepath = os.path.dirname(os.path.abspath(__file__))
 guesswords = filepath + "\\guesswords.txt"
 rulesf = filepath + "\\rules.txt"
 leaderboardf = filepath + "\\leaderboard.txt"
-
 guesswordslist = []
 
 #quit game
