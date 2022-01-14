@@ -2,7 +2,9 @@ import os
 import turtle
 import time
 import random
-import threading
+import string
+from unidecode import unidecode
+import wget
 
 #open guess words file
 filepath = os.path.dirname(os.path.abspath(__file__))
@@ -22,14 +24,35 @@ try:
         vardi = f.readlines()
     for a in vardi:
         a = a.replace("\n", "")
+        a = a.replace(string.punctuation, "")
+        a = unidecode(a, "utf-8")
         guesswordslist.append(a)
 except:
-    print("No wordslist file... exiting...")
-    quit()
+    wget('https://files.fm/down.php?i=fk3ks44zn', guesswords)
+    with open(guesswords, 'r', encoding='utf8') as f:
+        vardi = f.readlines()
+    for a in vardi:
+        a = a.replace("\n", "")
+        a = a.replace(string.punctuation, "")
+        a = unidecode(a, "utf-8")
+        guesswordslist.append(a)
 
 #game resolution
-screensizewidth = 1280
-screensizeheight = 720
+resolution = input("Enter c for custom resolution, or d for default: ")
+if resolution == "c":
+    while True:
+        gameresolution = input("Enter resolution WIDHTxHEIGHT without spaces, eg. 1280x720: ")
+        if "x" in gameresolution:
+            break
+else:
+    gameresolution = "1280x720"
+
+index = gameresolution.index("x")
+try:
+    screensizewidth = int(gameresolution[:index])
+    screensizeheight = int(gameresolution[(index+1):])
+except:
+    print("Wrong resolution input")
 
 #game setup
 turtle.setup(screensizewidth, screensizeheight)
@@ -89,8 +112,12 @@ try:
         a = a.replace("\n", "")
         rules.append(a)
 except:
-    print("No rules file... exiting...")
-    quit()
+    wget('https://files.fm/down.php?i=gckpe7ru7', rulesf)
+    with open(rulesf, 'r', encoding='utf8') as f:
+        rulesread = f.readlines()
+    for a in rulesread:
+        a = a.replace("\n", "")
+        rules.append(a)
 
 gotowidth = -(screensizewidth / 3)
 tgoto(2, gotowidth, 0)
@@ -140,10 +167,12 @@ def gameItself():
             tgoto(1, 10, 2.5)
             tgoto.b = -(tgoto.b)
             tgoto(3, tgoto.a, tgoto.b)
+            teksts.clear()
             writeP(f"Current guess: {chooseWord.wordguesshidden}")
             guess = turtle.textinput("Guessing Game", gameItself.enteraletter)
             try:
                 if len(guess) == 1:
+                    guess = unidecode(guess, "utf-8")
                     if guess in chooseWord.wordofchoice:
                         def moreIndex():
                             try:
@@ -241,22 +270,42 @@ def gameItself():
                                 except:
                                     gameItself.score = 0
                                 writeHeading(f"You have lost the game \nScore: {gameItself.score}", alignv="left", who=rupucis)
-                                time.sleep(5)
-                                return                    
+                                time.sleep(2)
+                                windo = turtle.textinput("Quit", 'Enter "q" if you want to quit, "r" to restart game')
+                                if windo == "q":
+                                        quit()
+                                else:
+                                        gameItself.score = 0
+                                        gameItself.strike = 0
+                                        gameItself.wordstrike = 0
+                                        gameItself.enteraletter = "Enter a letter"
+                                        rupucis.clear()
+                                        rupucis.goto(0, 0)
+                                strikewrite(gameItself.wordstrike, gameItself.strike)
+                                gameItself()
+                                                   
                 else:
                     gameItself.enteraletter = "Incorrect entry"
-                if chooseWord.wordguesshidden == chooseWord.wordguess:
+
+                if chooseWord.wordguesshidden == chooseWord.wordofchoice:
                     teksts.clear()
                     try:
                         gameItself.score
                     except:
                         gameItself.score = 0
                     gameItself.score = gameItself.score + len(chooseWord.wordguesshidden)
-                    scorewrite(gameItself.core)
+                    scorewrite(gameItself.score)
                     writeP(f"Score earned: {len(chooseWord.wordguesshidden)}")
-                    time.sleep(3)
+                    time.sleep(2)
                     if guesswordslist == []:
-                        return
+                        teksts.clear()
+                        tgoto(1, 2.5, 5, who=rupucis)
+                        tgoto.a = -(tgoto.a)
+                        tgoto(3, tgoto.a, tgoto.b, rupucis)
+                        writeP("No more words...")
+                        writeHeading(f"Score: {gameItself.score}", alignv="left", who=rupucis)
+                        time.sleep(5)
+                        quit()
                     else:
                         chooseWord()
                         
@@ -265,12 +314,12 @@ def gameItself():
                 if windo == "q":
                     quit()
                 if windo == "r":
-                                        score = 0
-                                        gameItself.strike = 0
-                                        gameItself.wordstrike = 0
-                                        gameItself.enteraletter = "Enter a letter"
-                                        rupucis.clear()
-                                        rupucis.goto(0, 0)
+                    gameItself.score = 0
+                    gameItself.strike = 0
+                    gameItself.wordstrike = 0
+                    gameItself.enteraletter = "Enter a letter"
+                    rupucis.clear()
+                    rupucis.goto(0, 0)
             strikewrite(gameItself.wordstrike, gameItself.strike)
             gameItself()
 
@@ -317,6 +366,7 @@ logs.onkeypress(exit, "q")
 
 logs.listen()
 turtle.done()
+quit()
 
 '''def uzprieksu():
     rupucis.forward(10)

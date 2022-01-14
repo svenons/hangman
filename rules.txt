@@ -5,4 +5,4 @@ Each word you get 5 no-consequence strikes
 After no-consequence strikes end, each strike draws part of the hangman
 When hangman is fully drawn, you loose
 Each word you guess gives you score of lengh of the word
-Press "q" to quit
+Press "q" or esc to quit
