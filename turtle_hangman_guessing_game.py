@@ -28,7 +28,7 @@ try:
         a = unidecode(a, "utf-8")
         guesswordslist.append(a)
 except:
-    wget('https://files.fm/down.php?i=fk3ks44zn', guesswords)
+    wget.download('https://files.fm/down.php?i=fk3ks44zn', guesswords)
     with open(guesswords, 'r', encoding='utf8') as f:
         vardi = f.readlines()
     for a in vardi:
@@ -112,7 +112,7 @@ try:
         a = a.replace("\n", "")
         rules.append(a)
 except:
-    wget('https://files.fm/down.php?i=gckpe7ru7', rulesf)
+    wget.download('https://files.fm/down.php?i=gckpe7ru7', rulesf)
     with open(rulesf, 'r', encoding='utf8') as f:
         rulesread = f.readlines()
     for a in rulesread:
