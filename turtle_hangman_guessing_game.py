@@ -1,4 +1,5 @@
 import os
+import sys
 import turtle
 import time
 import random
@@ -6,9 +7,10 @@ import string
 from unidecode import unidecode
 import wget
 
-#open guess words file
+#path to .py file
 filepath = os.path.dirname(os.path.abspath(__file__))
 guesswords = filepath + "\\guesswords.txt"
+customwords = filepath + "\\customwords.txt"
 rulesf = filepath + "\\rules.txt"
 leaderboardf = filepath + "\\leaderboard.txt"
 global guesswordslist
@@ -16,26 +18,7 @@ guesswordslist = []
 
 #quit game
 def exit():
-    quit()
-
-#append them into list
-try:
-    with open(guesswords, 'r', encoding='utf8') as f:
-        vardi = f.readlines()
-    for a in vardi:
-        a = a.replace("\n", "")
-        a = a.replace(string.punctuation, "")
-        a = unidecode(a, "utf-8")
-        guesswordslist.append(a)
-except:
-    wget.download('https://files.fm/down.php?i=fk3ks44zn', guesswords)
-    with open(guesswords, 'r', encoding='utf8') as f:
-        vardi = f.readlines()
-    for a in vardi:
-        a = a.replace("\n", "")
-        a = a.replace(string.punctuation, "")
-        a = unidecode(a, "utf-8")
-        guesswordslist.append(a)
+    os._exit(0)
 
 #game resolution
 resolution = input("Enter c for custom resolution, or d for default: ")
@@ -53,6 +36,63 @@ try:
     screensizeheight = int(gameresolution[(index+1):])
 except:
     print("Wrong resolution input")
+
+try:
+    os.remove(rulesf)
+except:
+    rules_dont_exist = True
+try:
+    os.remove(guesswords)
+except:
+    guesswords_dont_exist = True
+
+rules = []
+wget.download('http://80.209.239.78/owncloud/index.php/s/2gENrZrI0JZiPyb/download', rulesf)
+with open(rulesf, 'r', encoding='utf8') as f:
+        rulesread = f.readlines()
+for a in rulesread:
+        a = a.replace("\n", "")
+        rules.append(a)
+
+print("Categories: ")
+categorylist = ["easy", "animals", "foods", "travel"]
+for a in categorylist:
+    print("     *", a)
+wordstoguess = input('Enter first letter of category to select, or "custom" to select customwords.txt in your folder: ')
+while True:
+    if wordstoguess in ["e", "easy"]:
+        wget.download('http://80.209.239.78/owncloud/index.php/s/Co9FDfZJDHvr6AJ/download', guesswords)
+        break
+    elif wordstoguess in ["a", "animals", "animal"]:
+        wget.download('http://80.209.239.78/owncloud/index.php/s/Tdi36BfRTphYFdi/download', guesswords)
+        break
+    elif wordstoguess in ["f", "food","foods"]:
+        wget.download('http://80.209.239.78/owncloud/index.php/s/cNdFeduhVw4OURC/download', guesswords)
+        break
+    elif wordstoguess in ["travel", "t", "world"]:
+        wget.download('http://80.209.239.78/owncloud/index.php/s/5athpyNycfHHUX5/download', guesswords)
+        break
+    elif wordstoguess in ["custom", "c"]:
+        guesswords = customwords
+        try:
+            open(guesswords)
+        except:
+            with open(guesswords, mode="w") as f:
+                f.write("")
+            print("No custom file found. Created empty file")
+            quit()
+        break
+    else:
+        wordstoguess = input('Incorrect entry. Enter first letter of category or "custom" to select customwords.txt in your folder: ')
+
+#append them into list
+with open(guesswords, 'r', encoding='utf8') as f:
+    vardi = f.readlines()
+for a in vardi:
+    a = a.replace("\n", "")
+    a = a.replace(string.punctuation, "")
+    a = unidecode(a, "utf-8")
+    guesswordslist.append(a)
 
 #game setup
 turtle.setup(screensizewidth, screensizeheight)
@@ -104,21 +144,6 @@ def writeP(text, alignv="left", who=teksts):
 tgoto(1, 50, 3)
 writeHeading("Rules of The Hang Man Guessing Game: ")
 
-rules = []
-try:
-    with open(rulesf, 'r', encoding='utf8') as f:
-        rulesread = f.readlines()
-    for a in rulesread:
-        a = a.replace("\n", "")
-        rules.append(a)
-except:
-    wget.download('https://files.fm/down.php?i=gckpe7ru7', rulesf)
-    with open(rulesf, 'r', encoding='utf8') as f:
-        rulesread = f.readlines()
-    for a in rulesread:
-        a = a.replace("\n", "")
-        rules.append(a)
-
 gotowidth = -(screensizewidth / 3)
 tgoto(2, gotowidth, 0)
 for eachrule in rules:
@@ -140,9 +165,9 @@ def strikewrite(wvalue, tvalue):
     tgoto(3, tgoto.a, tgoto.b, striketext)
     striketext.clear()
     strikec = "Word strikes: " + str(wvalue)
-    writeP(text=strikec, alignv="left", who=striketext)
+    #writeP(text=strikec, alignv="left", who=striketext)
     tgoto(2, 0, 50, who=striketext)
-    strikec = "Total strikes: " + str(tvalue)
+    strikec = "Strikes: " + str(tvalue)
     writeP(text=strikec, alignv="left", who=striketext)
 
 def chooseWord():
@@ -271,9 +296,9 @@ def gameItself():
                                     gameItself.score = 0
                                 writeHeading(f"You have lost the game \nScore: {gameItself.score}", alignv="left", who=rupucis)
                                 time.sleep(2)
-                                windo = turtle.textinput("Quit", 'Enter "q" if you want to quit, "r" to restart game')
-                                if windo == "q":
-                                        quit()
+                                windo = turtle.textinput("Quit", 'Enter "q" if you want to quit, otherwhise the game will restart')
+                                if windo in ["q", "x"]:
+                                        os._exit(0)
                                 else:
                                         gameItself.score = 0
                                         gameItself.strike = 0
@@ -281,6 +306,7 @@ def gameItself():
                                         gameItself.enteraletter = "Enter a letter"
                                         rupucis.clear()
                                         rupucis.goto(0, 0)
+                                        chooseWord()
                                 strikewrite(gameItself.wordstrike, gameItself.strike)
                                 gameItself()
                                                    
@@ -305,15 +331,16 @@ def gameItself():
                         writeP("No more words...")
                         writeHeading(f"Score: {gameItself.score}", alignv="left", who=rupucis)
                         time.sleep(5)
-                        quit()
+                        os._exit(0)
                     else:
                         chooseWord()
                         
             except:
                 windo = turtle.textinput("Quit", 'Enter "q" if you want to quit, "r" to restart game')
-                if windo == "q":
-                    quit()
-                if windo == "r":
+                if windo in ["q", "x"]:
+                    os._exit(0)
+                if "r" in windo:
+                    chooseWord()
                     gameItself.score = 0
                     gameItself.strike = 0
                     gameItself.wordstrike = 0
@@ -367,17 +394,3 @@ logs.onkeypress(exit, "q")
 logs.listen()
 turtle.done()
 quit()
-
-'''def uzprieksu():
-    rupucis.forward(10)
-def atpakal():
-    rupucis.backward(10)
-def palabi():
-    rupucis.right(45)
-def pakreisi():
-    rupucis.left(45)
-
-logs.onkeypress(uzprieksu, "Up")
-logs.onkey(atpakal, "Down")
-logs.onkey(palabi, "Right")
-logs.onkey(pakreisi, "Left")'''
