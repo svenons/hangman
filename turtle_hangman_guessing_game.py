@@ -237,23 +237,26 @@ def gameItself():
             try:
                 if len(guess) == 1:
                     guess = unidecode(guess, "utf-8")
-                    if guess in chooseWord.wordofchoice:
-                        def moreIndex():
-                            try:
-                                index = chooseWord.wordlist.index(guess)
-                                return True
-                            except:
-                                return False
-                        while moreIndex() == True:
-                            index = chooseWord.wordlist.index(guess)
-                            chooseWord.wordlist[index] = "xyz"
-                            startofword = chooseWord.wordguesshidden[:index]
-                            endofword = chooseWord.wordguesshidden[(index + 1):]
-                            chooseWord.wordguesshidden = startofword + guess + endofword
-                            teksts.clear()
-                            writeP(f"Current guess: {chooseWord.wordguesshidden}")
-                            gameItself.enteraletter = "Enter a letter"
-                    else:
+                    found = False
+                    for x in [guess, guess.upper(), guess.lower()]:
+                        if x in chooseWord.wordofchoice:
+                            found = True
+                            def moreIndex():
+                                try:
+                                    chooseWord.wordlist.index(x)
+                                    return True
+                                except:
+                                    return False
+                            while moreIndex() == True:
+                                index = chooseWord.wordlist.index(x)
+                                chooseWord.wordlist[index] = "xyz"
+                                startofword = chooseWord.wordguesshidden[:index]
+                                endofword = chooseWord.wordguesshidden[(index + 1):]
+                                chooseWord.wordguesshidden = startofword + x + endofword
+                                teksts.clear()
+                                writeP(f"Current guess: {chooseWord.wordguesshidden}")
+                                gameItself.enteraletter = "Enter a letter"
+                    if found == False:
                         gameItself.enteraletter = "Such letter isn't found"
                         try:
                             gameItself.strike
@@ -378,29 +381,40 @@ def gameItself():
                         
             except:
                 windo = turtle.textinput("Quit", 'Enter "q" if you want to quit, "r" to restart game')
-                if windo in ["q", "x"]:
-                    os._exit(0)
-                if "r" in windo:
-                    chooseWord()
-                    gameItself.score = 0
-                    gameItself.strike = 0
-                    gameItself.wordstrike = 0
-                    gameItself.enteraletter = "Enter a letter"
-                    rupucis.clear()
-                    rupucis.goto(0, 0)
+                while True:
+                    if windo == None:
+                        #windo = turtle.textinput("Quit", 'Enter "q" if you want to quit, "r" to restart game')
+                        gameItself()
+                    elif windo in ["q", "x"]:
+                        os._exit(0)
+                    elif "r" in windo:
+                        chooseWord()
+                        gameItself.score = 0
+                        gameItself.strike = 0
+                        gameItself.wordstrike = 0
+                        gameItself.enteraletter = "Enter a letter"
+                        rupucis.clear()
+                        rupucis.goto(0, 0)
+                        break
+                    else:
+                        windo = turtle.textinput("Quit", 'Enter "q" if you want to quit, "r" to restart game')
+                        continue
             strikewrite(gameItself.wordstrike, gameItself.strike)
             gameItself()
 
 def continuegame():
         teksts.clear()
+        name = turtle.textinput("Nickname", "Enter your nickname")
         while True:
-            name = turtle.textinput("Nickname", "Enter your nickname")
             if name == None:
-                continue
+                name = turtle.textinput("Nickname", "You have to choose a nickname")
             elif name == "":
-                continue
+                name = turtle.textinput("Nickname", "You have to choose a nickname")
+            elif len(name) > 7:
+                name = turtle.textinput("Nickname", "You have to choose shorter a nickname")
             else:
                 break
+            
         tgoto(1, 2.1, 2.5, nametext)
         tgoto.a = -(tgoto.a)
         tgoto(3, tgoto.a, tgoto.b, nametext)
