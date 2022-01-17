@@ -20,22 +20,43 @@ guesswordslist = []
 def exit():
     os._exit(0)
 
-#game resolution
-resolution = input("Enter c for custom resolution, or d for default: ")
-if resolution == "c":
-    while True:
-        gameresolution = input("Enter resolution WIDHTxHEIGHT without spaces, eg. 1280x720: ")
-        if "x" in gameresolution:
-            break
-else:
-    gameresolution = "1280x720"
+#clear python console:
+clearConsole = lambda: os.system('cls' if os.name in ('nt', 'dos') else 'clear')
 
+#game resolution
+while True:
+    print("Resolution choices: ")
+    resolutionchoices = ["540p (qHD)", "720p (HD) **Default", "1080p (FHD)", "2K", "1440p (QHD)"]
+    for a in resolutionchoices:
+        print("     *", a)
+    resolution = input("Select resolution: ")
+    if resolution == "qhd":
+        resolution = input('Did you mean qHD(540p) or QHD(1440p)?: ')
+    if resolution in ["540", "540p", "qHD", "960x540"]:
+        gameresolution = "940x540"
+        break
+    elif resolution in ["720p", "720", "1280x720", "HD", "hd"]:
+        gameresolution = "1280x720"
+        break
+    elif resolution in ["1080p", "1080", "FHD", "fhd", "1920x1080"]:
+        gameresolution = "1920x1080"
+        break
+    elif resolution in ["2K", "2k", "2048", "2048p", "2048x1080"]:
+        gameresolution = "2048x1080"
+        break
+    elif resolution in ["1440p", "QHD", "qhd", "1440", "2560x1440"]:
+        gameresolution = "2560x1440"
+        break
+    else:
+        print("\nSelecting default resolution...")
+        time.sleep(1)
+        gameresolution = "1280x720"
+        break
+    
 index = gameresolution.index("x")
-try:
-    screensizewidth = int(gameresolution[:index])
-    screensizeheight = int(gameresolution[(index+1):])
-except:
-    print("Wrong resolution input")
+screensizewidth = int(gameresolution[:index])
+screensizeheight = int(gameresolution[(index+1):])
+
 
 try:
     os.remove(rulesf)
@@ -53,12 +74,13 @@ with open(rulesf, 'r', encoding='utf8') as f:
 for a in rulesread:
         a = a.replace("\n", "")
         rules.append(a)
+clearConsole()
 
 print("Categories: ")
-categorylist = ["easy", "animals", "foods", "travel"]
+categorylist = ["easy", "animals", "foods", "travel", "custom (customwords.txt in your folder)"]
 for a in categorylist:
     print("     *", a)
-wordstoguess = input('Enter first letter of category to select, or "custom" to select customwords.txt in your folder: ')
+wordstoguess = input('Select category: ')
 while True:
     if wordstoguess in ["e", "easy"]:
         wget.download('http://80.209.239.78/owncloud/index.php/s/Co9FDfZJDHvr6AJ/download', guesswords)
@@ -79,11 +101,23 @@ while True:
         except:
             with open(guesswords, mode="w") as f:
                 f.write("")
-            print("No custom file found. Created empty file")
-            quit()
-        break
+            print("\nNo custom file found. Created empty file. Add each word to a new line in file.")
+            time.sleep(5)
+            print("\nExitting...")
+            time.sleep(0.5)
+            exit()
+        if os.stat(guesswords).st_size == 0:
+                    print("\nEmpty custom file. Add each word to a new line in file.")
+                    time.sleep(5)
+                    print("\nExitting...")
+                    time.sleep(0.5)
+                    exit()
+        else:
+            break
     else:
         wordstoguess = input('Incorrect entry. Enter first letter of category or "custom" to select customwords.txt in your folder: ')
+clearConsole()
+print("The Game Turtle window has been opened, proceed to it to continue the game...")
 
 #append them into list
 with open(guesswords, 'r', encoding='utf8') as f:
@@ -93,7 +127,6 @@ for a in vardi:
     a = a.replace(string.punctuation, "")
     a = unidecode(a, "utf-8")
     guesswordslist.append(a)
-
 #game setup
 turtle.setup(screensizewidth, screensizeheight)
 logs = turtle.Screen()
@@ -134,11 +167,17 @@ def tgoto(cmd, parw, parh, who=teksts):
     who.goto(tgoto.a, tgoto.b)
 
 def writeHeading(text, alignv="center", who=teksts):
-    style = ("Roboto", 30, "italic")
+    if gameresolution == "940x540":
+        style = ("Roboto", 20, "italic")
+    else:
+        style = ("Roboto", 30, "italic")
     who.write(text, font=style, align=alignv)
 
 def writeP(text, alignv="left", who=teksts):
-    style = ("Roboto", 20, "italic")
+    if gameresolution == "940x540":
+        style = ("Roboto", 15, "italic")
+    else:
+        style = ("Roboto", 20, "italic")
     who.write(text, font=style, align=alignv)
 
 tgoto(1, 50, 3)
@@ -294,8 +333,10 @@ def gameItself():
                                     gameItself.score
                                 except:
                                     gameItself.score = 0
+                                teksts.clear()
+                                writeP(f"The word was: {chooseWord.wordofchoice}")
                                 writeHeading(f"You have lost the game \nScore: {gameItself.score}", alignv="left", who=rupucis)
-                                time.sleep(2)
+                                time.sleep(1)
                                 windo = turtle.textinput("Quit", 'Enter "q" if you want to quit, otherwhise the game will restart')
                                 if windo in ["q", "x"]:
                                         os._exit(0)
@@ -328,7 +369,7 @@ def gameItself():
                         tgoto(1, 2.5, 5, who=rupucis)
                         tgoto.a = -(tgoto.a)
                         tgoto(3, tgoto.a, tgoto.b, rupucis)
-                        writeP("No more words...")
+                        writeP("No more words...\nExitting...")
                         writeHeading(f"Score: {gameItself.score}", alignv="left", who=rupucis)
                         time.sleep(5)
                         os._exit(0)
@@ -388,7 +429,6 @@ except:
     gameItself.gameFinished = False
 
 logs.onkeypress(exit, "q")
-
 
 
 logs.listen()

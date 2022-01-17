@@ -1,0 +1,6 @@
+You guess a word by one letter at a time
+If you guess a letter correctly, it appears down below
+After 5 incorrect guesses per each word, you start getting strikes
+Each word you guess gives you score equal to the lengh of word
+If the hangman is fully drawn, you loose.
+Press "q" or esc to quit
